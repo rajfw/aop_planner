@@ -1,4 +1,4 @@
-# aop_planner
+# AOP_Planner
 📋 AOP Planner Pro - Feature Overview Document
 🎯 Project Summary
 Annual Operating Plan (AOP) Planning Tool. A centralized platform where Business Units submit feature requests, which are automatically analyzed, prioritized via RICE framework, and collaboratively validated by PM leadership.
