@@ -919,7 +919,7 @@ def step1_submit():
         st.markdown('</div>', unsafe_allow_html=True)
 
 # ======================
-# LIST FEATURES PAGE
+# LIST FEATURES PAGE - SIMPLIFIED VERSION
 # ======================
 def list_features_page():
     st.markdown('<h1 class="main-header">📋 All Feature Requests</h1>', unsafe_allow_html=True)
@@ -932,7 +932,7 @@ def list_features_page():
             st.rerun()
         return
     
-    # Filters
+    # Filters (same as before)
     col1, col2, col3, col4 = st.columns(4)
     
     with col1:
@@ -947,7 +947,7 @@ def list_features_page():
     with col4:
         filter_type = st.selectbox("Filter by Type", ["All", "Hero Big Rock", "Big Rock", "Small Rock"])
     
-    # Apply filters
+    # Apply filters (same as before)
     filtered_features = st.session_state.features.copy()
     
     if filter_bu != "All":
@@ -966,88 +966,101 @@ def list_features_page():
     st.write(f"**Showing {len(filtered_features)} of {len(st.session_state.features)} features**")
     
     for feature in filtered_features:
+        # Create a container for each feature
         with st.container():
-            col1, col2 = st.columns([4, 1])
-            
-            with col1:
-                badge_class = get_bu_badge(feature['bu'])
-                status_badge = get_status_badge(feature.get('status', 'Draft'))
-                
-                # Get dependent teams from dependency details
-                dependent_teams = list(set([dep.get('team', '') for dep in feature.get('dependency_details', []) if dep.get('team')]))
-                
-                # Count total dependencies
-                total_deps = len(feature.get('dependency_details', []))
-                
-                # Render dependencies HTML
-                deps_html = render_dependencies_html(feature.get('dependency_details', []))
-                
-                st.markdown(f"""
-                <div class="feature-list-card status-{feature.get('status', 'Draft').lower().replace(' ', '-')}">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <div>
-                            <h4 style="margin: 0 0 8px 0;">{feature['title']}</h4>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
-                                <span class="{badge_class} badge">{feature['bu']}</span>
-                                <span style="background-color: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
-                                    {feature['year']} {feature['half']}-{feature['quarter']}
-                                </span>
-                                <span style="background-color: #F3F4F6; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
-                                    {feature['type']}
-                                </span>
-                                <span style="background-color: #FEF3C7; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
-                                    Impact: {feature.get('impact', 'N/A')}/10
-                                </span>
-                                <span style="background-color: #D1FAE5; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
-                                    {status_badge} {feature.get('status', 'Draft')}
-                                </span>
-                            </div>
-                        </div>
-                        <span style="font-size: 0.9rem; color: #6B7280;">{feature['id']}</span>
-                    </div>
-                    <p style="margin: 8px 0; color: #4B5563;">{feature['description'][:200]}...</p>
-                    <div style="margin-top: 10px;">
-                        <p style="margin: 5px 0; font-size: 0.9rem;">
-                            <strong>Dependent Teams:</strong> {', '.join(dependent_teams) if dependent_teams else 'None'}
-                            <span style="margin-left: 10px; color: #6B7280;">
-                                ({total_deps} dependency{'' if total_deps == 1 else 's'})
+            st.markdown(f"""
+            <div class="feature-list-card status-{feature.get('status', 'Draft').lower().replace(' ', '-')}">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div>
+                        <h4 style="margin: 0 0 8px 0;">{feature['title']}</h4>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px;">
+                            <span class="{get_bu_badge(feature['bu'])} badge">{feature['bu']}</span>
+                            <span style="background-color: #E5E7EB; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
+                                {feature['year']} {feature['half']}-{feature['quarter']}
                             </span>
-                        </p>
-                        <div style="margin: 10px 0;">
-                            <strong>Dependent Functionality/Needs:</strong>
-                            {deps_html}
+                            <span style="background-color: #F3F4F6; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
+                                {feature['type']}
+                            </span>
+                            <span style="background-color: #FEF3C7; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
+                                Impact: {feature.get('impact', 'N/A')}/10
+                            </span>
+                            <span style="background-color: #D1FAE5; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem;">
+                                {get_status_badge(feature.get('status', 'Draft'))} {feature.get('status', 'Draft')}
+                            </span>
                         </div>
                     </div>
-                    <div style="margin-top: 10px; font-size: 0.8rem; color: #6B7280;">
-                        Created: {feature.get('created_date', 'Unknown')}
-                    </div>
+                    <span style="font-size: 0.9rem; color: #6B7280;">{feature['id']}</span>
                 </div>
-                """, unsafe_allow_html=True)
+                <p style="margin: 8px 0; color: #4B5563;">{feature['description'][:200]}...</p>
+            </div>
+            """, unsafe_allow_html=True)
             
-            with col2:
-                # Action buttons
-                if st.button("👁️ View", key=f"list_view_{feature['id']}", use_container_width=True):
-                    st.session_state.view_feature_id = feature['id']
-                    st.session_state.step = "view"
-                    st.rerun()
+            # Now display dependencies separately using Streamlit components
+            with st.expander("View Dependencies & Actions", expanded=False):
+                col1, col2 = st.columns([3, 1])
                 
-                if st.button("✏️ Edit", key=f"list_edit_{feature['id']}", use_container_width=True):
-                    reset_dependency_count()
-                    st.session_state.edit_feature_id = feature['id']
-                    st.session_state.step = 1
-                    st.rerun()
+                with col1:
+                    # Get dependent teams
+                    dependent_teams = list(set([dep.get('team', '') for dep in feature.get('dependency_details', []) if dep.get('team')]))
+                    total_deps = len(feature.get('dependency_details', []))
+                    
+                    st.write(f"**Dependent Teams:** {', '.join(dependent_teams) if dependent_teams else 'None'} ({total_deps} dependency{'s' if total_deps != 1 else ''})")
+                    
+                    # Display dependencies
+                    if feature.get('dependency_details'):
+                        st.write("**Dependent Functionality/Needs:**")
+                        
+                        # Group by team
+                        team_deps = {}
+                        for dep in feature.get('dependency_details', []):
+                            team = dep.get('team', '')
+                            if team:
+                                if team not in team_deps:
+                                    team_deps[team] = []
+                                team_deps[team].append(dep)
+                        
+                        for team, deps in team_deps.items():
+                            badge_class = get_bu_badge(team)
+                            st.markdown(f'<span class="{badge_class} badge">{team}</span>', unsafe_allow_html=True)
+                            
+                            for dep in deps:
+                                title = dep.get('title', 'Untitled Dependency')
+                                description = dep.get('description', 'No description provided')
+                                
+                                st.markdown(f"""
+                                <div style="margin: 4px 0 4px 15px; padding-left: 10px; border-left: 2px solid #D1D5DB; margin-bottom: 8px;">
+                                    <div style="font-weight: 500; color: #111827;">{title}</div>
+                                    <div style="color: #6B7280; font-size: 0.9rem;">{description}</div>
+                                </div>
+                                """, unsafe_allow_html=True)
+                    
+                    st.caption(f"Created: {feature.get('created_date', 'Unknown')}")
                 
-                if st.button("🗑️ Delete", key=f"list_delete_{feature['id']}", use_container_width=True):
-                    delete_feature(feature['id'])
-                    st.success(f"Feature {feature['id']} deleted!")
-                    time.sleep(0.5)
-                    st.rerun()
+                with col2:
+                    # Action buttons
+                    if st.button("👁️ View Details", key=f"list_view_{feature['id']}", use_container_width=True):
+                        st.session_state.view_feature_id = feature['id']
+                        st.session_state.step = "view"
+                        st.rerun()
+                    
+                    if st.button("✏️ Edit", key=f"list_edit_{feature['id']}", use_container_width=True):
+                        reset_dependency_count()
+                        st.session_state.edit_feature_id = feature['id']
+                        st.session_state.step = 1
+                        st.rerun()
+                    
+                    if st.button("🗑️ Delete", key=f"list_delete_{feature['id']}", use_container_width=True):
+                        delete_feature(feature['id'])
+                        st.success(f"Feature {feature['id']} deleted!")
+                        time.sleep(0.5)
+                        st.rerun()
+            
+            st.markdown("</div>", unsafe_allow_html=True)
     
     # Back button
     if st.button("← Back to Home", use_container_width=True):
         st.session_state.step = "home"
         st.rerun()
-
 # ======================
 # VIEW FEATURE PAGE
 # ======================
@@ -1120,7 +1133,7 @@ def view_feature_page():
             if feature_to_view.get('competitor_score', 0) > 0:
                 st.markdown(f"**Competitor Score:** {feature_to_view.get('competitor_score', 'N/A')}/10")
         
-        # Dependencies - Now properly mapped with one-to-many
+        # Dependencies - Fixed version
         st.subheader("🔗 Dependent Functionality/Needs by Team")
         
         # Get dependent teams from dependency details
@@ -1130,9 +1143,32 @@ def view_feature_page():
         if dependent_teams:
             st.markdown(f"**Dependent Teams:** {', '.join(dependent_teams)} ({total_deps} dependency{'s' if total_deps > 1 else ''})")
             
-            # Render dependencies organized by team
-            deps_html = render_dependencies_html(feature_to_view.get('dependency_details', []))
-            st.markdown(deps_html, unsafe_allow_html=True)
+            # Display dependencies without using render_dependencies_html()
+            if feature_to_view.get('dependency_details'):
+                # Group by team
+                team_deps = {}
+                for dep in feature_to_view.get('dependency_details', []):
+                    team = dep.get('team', '')
+                    if team:
+                        if team not in team_deps:
+                            team_deps[team] = []
+                        team_deps[team].append(dep)
+                
+                # Display each team's dependencies
+                for team, deps in team_deps.items():
+                    badge_class = get_bu_badge(team)
+                    st.markdown(f'<div style="margin-top: 10px;"><span class="{badge_class} badge">{team}</span></div>', unsafe_allow_html=True)
+                    
+                    for dep in deps:
+                        title = dep.get('title', 'Untitled Dependency')
+                        description = dep.get('description', 'No description provided')
+                        
+                        st.markdown(f'''
+                        <div style="margin: 8px 0 8px 15px; padding-left: 10px; border-left: 2px solid #D1D5DB;">
+                            <div style="font-weight: 600; color: #111827; font-size: 1rem;">{title}</div>
+                            <div style="color: #6B7280; font-size: 0.95rem; margin-top: 4px;">{description}</div>
+                        </div>
+                        ''', unsafe_allow_html=True)
         else:
             st.info("No dependencies specified for this feature")
         
@@ -1178,7 +1214,7 @@ def view_feature_page():
                 st.rerun()
         
         st.markdown('</div>', unsafe_allow_html=True)
-
+        
 # ======================
 # STEP 2: ANALYZE & SCORE
 # ======================
